@@ -41,7 +41,9 @@ import re
 from torchvision.transforms import ToPILImage
 import supervision as sv
 import torchvision.transforms as T
-from util.box_annotator import BoxAnnotator 
+from util.box_annotator import BoxAnnotator
+
+import string
 
 
 def get_caption_model_processor(model_name, model_name_or_path="Salesforce/blip2-opt-2.7b", device=None):
@@ -442,9 +444,10 @@ def get_som_labeled_img(image_source: Union[str, Image.Image], model=None, BOX_T
     filtered_boxes = torch.tensor([box['bbox'] for box in filtered_boxes_elem])
     print('len(filtered_boxes):', len(filtered_boxes), starting_idx)
 
-    # get parsed icon local semantics
+    # # get parsed icon local semantics
     time1 = time.time()
     if use_local_semantics:
+        # # Image Captioning
         caption_model = caption_model_processor['model']
         if 'phi3_v' in caption_model.config.model_type: 
             parsed_content_icon = get_parsed_content_icon_phi3v(filtered_boxes, ocr_bbox, image_source, caption_model_processor)
@@ -538,3 +541,54 @@ def check_ocr_box(image_source: Union[str, Image.Image], display_img = True, out
         elif output_bb_format == 'xyxy':
             bb = [get_xyxy(item) for item in coord]
     return (text, bb), goal_filtering
+
+
+def is_hexadecimal(s):
+    """
+    Check if a string is hexadecimal or not
+    :param s: String
+    :return: True/False
+    """
+    return all(c in string.hexdigits for c in s)
+
+
+def is_base64(s):
+    """
+    Check if a string is encoded by base64 or not
+    :param s: String
+    :return: True/False
+    """
+    try:
+        if isinstance(s, str):
+            # If there's any unicode here, an exception will be thrown and the function will return false
+            s_bytes = bytes(s, 'ascii')
+        elif isinstance(s, bytes):
+            s_bytes = s
+        else:
+            raise ValueError("Argument must be string or bytes")
+        return base64.b64encode(base64.b64decode(s_bytes)) == s_bytes
+    except Exception as err:
+        print(f"[ERROR-is_base64] {err}")
+        return False
+
+
+def bts_to_img(bts):
+    """
+    bytes array to cv2 image object
+    :param bts: results from image_to_bts
+    :return: cv2 image object
+    """
+    buff = np.frombuffer(bts, np.uint8)
+    buff = buff.reshape(1, -1)
+    img = cv2.imdecode(buff, cv2.IMREAD_COLOR)
+    return img
+
+
+def load_img_by_cv2(img_path, option=cv2.IMREAD_COLOR):
+    """
+    Load image by openCV2
+    :param img_path:
+    :param option: cv2.IMREAD_COLOR, cv2.IMREAD_GRAYSCALE, cv2.IMREAD_UNCHANGED (including alpha channel)
+    :return: type openCV2
+    """
+    return cv2.imread(img_path, option)
