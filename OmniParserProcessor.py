@@ -53,8 +53,4 @@ def process(image_input, box_threshold=0.05, iou_threshold=0.1, use_paddleocr=Tr
         {'type': v_dict['type'], 'interactivity': v_dict['interactivity'], 'content': v_dict['content']} for v_dict in
         parsed_content_list if isinstance(v_dict, dict)]
     parsed_content_list = '\n'.join([f'icon {i}: ' + str(v) for i,v in enumerate(parsed_content_list)])
-    parsed_content_dict ={}
-    for i, v in enumerate(parsed_content_list):
-        parsed_content_dict.update({f'icon {i}': v})
-
     return dino_labled_img, str(parsed_content_list)
