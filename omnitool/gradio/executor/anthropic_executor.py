@@ -12,7 +12,7 @@ from anthropic.types.beta import (
 )
 from anthropic.types import TextBlock
 from anthropic.types.beta import BetaMessage, BetaTextBlock, BetaToolUseBlock
-from tools import ComputerTool, ToolCollection, ToolResult
+from omnitool.gradio.tools import ComputerTool, ToolCollection, ToolResult
 
 
 class AnthropicExecutor:
@@ -71,6 +71,7 @@ class AnthropicExecutor:
         
         return tool_result_content
 
+
 def _message_display_callback(messages):
     display_messages = []
     for msg in messages:
@@ -89,6 +90,7 @@ def _message_display_callback(messages):
             print("error", e)
             pass
     return display_messages
+
 
 def _make_api_tool_result(
     result: ToolResult, tool_use_id: str
