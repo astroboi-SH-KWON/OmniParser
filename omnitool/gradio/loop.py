@@ -22,6 +22,7 @@ from executor.anthropic_executor import AnthropicExecutor
 
 BETA_FLAG = "computer-use-2024-10-22"
 
+
 class APIProvider(StrEnum):
     ANTHROPIC = "anthropic"
     BEDROCK = "bedrock"
@@ -35,6 +36,7 @@ PROVIDER_TO_DEFAULT_MODEL_NAME: dict[APIProvider, str] = {
     APIProvider.VERTEX: "claude-3-5-sonnet-v2@20241022",
     APIProvider.OPENAI: "gpt-4o",
 }
+
 
 def sampling_loop_sync(
     *,
@@ -104,6 +106,9 @@ def sampling_loop_sync(
     
     elif model in set(["omniparser + gpt-4o", "omniparser + o1", "omniparser + o3-mini", "omniparser + R1", "omniparser + qwen2.5vl"]):
         while True:
+            """
+            parsed_screen['screen_info'] = screen_info += f'ID: {idx}, Icon: {element["content"]}\nID: {idx}, Text: ...'
+            """
             parsed_screen = omniparser_client()
             tools_use_needed, vlm_response_json = actor(messages=messages, parsed_screen=parsed_screen)
 
